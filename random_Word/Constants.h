@@ -9,8 +9,8 @@
 #ifndef random_Word_Constants_h
 #define random_Word_Constants_h
 
-const CGFloat kWordLabelWidth = 20.0f;
-const CGFloat kWordLabelHeight = 30.0f;
+const CGFloat kRandomWordLabelWidth = 20.0f;
+const CGFloat kRandomWordLabelHeight = 30.0f;
 const CGFloat kAlphabetLabelHeight = 40.0f;
 const CGFloat kAlphabetLabelWidth = 30.f;
 

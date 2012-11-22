@@ -56,29 +56,29 @@
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "No"
+         shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/HangmanViewController.m"
-         timestampString = "375312224.343808"
+         timestampString = "375316145.788992"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "67"
-         endingLineNumber = "67"
+         startingLineNumber = "75"
+         endingLineNumber = "75"
          landmarkName = "-getRandomWordButton:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "No"
+         shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/HangmanViewController.m"
-         timestampString = "375312734.245566"
+         timestampString = "375316145.788992"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "105"
-         endingLineNumber = "105"
-         landmarkName = "-compareGuess"
+         startingLineNumber = "85"
+         endingLineNumber = "85"
+         landmarkName = "-getRandomWordButton:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

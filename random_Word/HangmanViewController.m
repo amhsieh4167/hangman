@@ -13,8 +13,9 @@
 
 @interface HangmanViewController ()
 
-@property (strong, nonatomic) NSDictionary* randomWords;
+@property (strong, nonatomic) NSString* randomWord;
 @property (strong, nonatomic) IBOutlet UILabel *oRandomWordLabel;
+
 @property (strong, nonatomic) NSString* currentGuess;
 
 @property (retain, nonatomic) UIView *alphabetsView;
@@ -46,7 +47,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self drawAlphabets];
+    [self drawAlphabetLabels];
 }
 
 - (void)didReceiveMemoryWarning
@@ -56,8 +57,10 @@
 }
 
 - (void)dealloc {
+    [_randomWord release];
     [_oRandomWordLabel release];
     [_alphabetsView release];
+    [_randomWordsView release];
     [super dealloc];
 }
 
@@ -70,14 +73,15 @@
     [NSURLConnection sendAsynchronousRequest:urlRequest queue:[[NSOperationQueue alloc] init]
            completionHandler:^(NSURLResponse* response, NSData* data, NSError* error)
                  {
-                     self.randomWords = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+                     _randomWord = [[[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error] valueForKey:@"word"] uppercaseString];
                      
+                     //must retain here, otherwise the value would be lost in the main queue
+                     [_randomWord retain];
                      dispatch_async(dispatch_get_main_queue(), ^
                              {
                                  // on main queue
-                                 NSString* randomWord = [[self.randomWords valueForKey:@"word"] uppercaseString];
-                                 self.oRandomWordLabel.text = randomWord;
-                                 [self drawRandomWordLabel:randomWord];
+                                 self.oRandomWordLabel.text = _randomWord;
+                                 [self drawRandomWordLabels];
                              });
                  }];
 }
@@ -90,7 +94,7 @@
 {
     CGPoint touch = [[touches anyObject] locationInView:self.alphabetsView];
     
-    for (AlphabetLabel* label in self.alphabetsView.subviews) {
+    for (AlphabetLabel* label in _alphabetsView.subviews) {
         if(CGRectContainsPoint(label.frame, touch)) {
             if (!label.isUsed) {
                 [label setToFade];
@@ -117,18 +121,33 @@
 #pragma mark label methods
 
 
--(void)drawAlphabets
+-(void)resetWordLabels
 {
-    self.alphabetsView = [[UIView alloc] initWithFrame:CGRectMake(260.0f, 14.0f, 60.0f, 550.0f)];
-    [self.view addSubview:self.alphabetsView];
+    for(UIView* view in self.view.subviews)
+    {
+        if([view isMemberOfClass:[WordLabel class]]) {
+            [view removeFromSuperview];
+        }
+    }
     
-    CGFloat startY;
-    CGFloat containerWidth = self.alphabetsView.frame.size.width;
-    CGFloat containerHeight = self.alphabetsView.frame.size.height;
+    for(AlphabetLabel* label in _alphabetsView.subviews) {
+        if (label.isUsed) {
+            [label setToDefault];
+        }
+    }
+}
+
+-(void)drawAlphabetLabels
+{
+    CGFloat containerWidth = kAlphabetLabelWidth*2;
+    CGFloat containerHeight = kAlphabetLabelHeight*13;
+    
+    _alphabetsView = [[UIView alloc] initWithFrame:CGRectMake(260.0f, 14.0f, containerWidth, containerHeight)];
+    [self.view addSubview:_alphabetsView];
+    
     CGFloat mCurrentX = 0.0f;
     CGFloat mCurrentY = 0.0f;
-    
-    startY = mCurrentY;
+    CGFloat startY = mCurrentY;
     
     NSString* alphabetsString = [[NSString alloc] initWithString:@"A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"];
     NSMutableArray* alphabetsArray = [[alphabetsString componentsSeparatedByString:@","] mutableCopy];
@@ -143,48 +162,34 @@
             
             alphabetLabel.text = alphabetsArray[alphabetPosition];
             alphabetPosition++;
-            [self.alphabetsView addSubview:alphabetLabel];
+            [_alphabetsView addSubview:alphabetLabel];
 
             mCurrentY += kAlphabetLabelHeight;
         }
         mCurrentY = startY;
         mCurrentX += kAlphabetLabelWidth;
     }
+    [alphabetsString release];
+    [alphabetsArray release];
 }
 
--(void)resetWordLabels
-{
-    for(UIView* view in self.view.subviews)
-    {
-        if([view isMemberOfClass:[WordLabel class]]) {
-            [view removeFromSuperview];
-        }
-    }
-    
-    for(AlphabetLabel* label in self.alphabetsView.subviews) {
-        if (label.isUsed) {
-            [label setToDefault];
-        }
-    }
-}
-
--(void)drawRandomWordLabel:(NSString*)randomWord
+-(void)drawRandomWordLabels
 {
     CGFloat mCurrentX;
-    CGFloat startY = self.view.frame.size.height - (kWordLabelHeight + kFooterSpace);
+    CGFloat startY = self.view.frame.size.height - (kRandomWordLabelHeight + kFooterSpace);
     CGFloat containingViewWidth = self.view.frame.size.width;
-    int numberOfLetters = [randomWord length];
+    int numberOfLetters = [_randomWord length];
     
-    mCurrentX = (containingViewWidth - ((kWordLabelWidth * numberOfLetters) + (kLabelBufferSpace * (numberOfLetters - 1))))/2;
+    mCurrentX = (containingViewWidth - ((kRandomWordLabelWidth * numberOfLetters) + (kLabelBufferSpace * (numberOfLetters - 1))))/2;
     
     for(int i = 0; i < numberOfLetters; i++)
     {
-        NSString* randomWordLetter = [NSString stringWithFormat:@"%c", [randomWord characterAtIndex:i]];
-        WordLabel* wordLabel = [[WordLabel alloc] initWithFrame:CGRectMake(mCurrentX, startY, kWordLabelWidth, kWordLabelHeight) andText:randomWordLetter];
+        NSString* randomWordLetter = [NSString stringWithFormat:@"%c", [_randomWord characterAtIndex:i]];
+        WordLabel* wordLabel = [[WordLabel alloc] initWithFrame:CGRectMake(mCurrentX, startY, kRandomWordLabelWidth, kRandomWordLabelHeight) andText:randomWordLetter];
         
         [self.view addSubview:wordLabel];
         
-        mCurrentX += kWordLabelWidth + kLabelBufferSpace;
+        mCurrentX += kRandomWordLabelWidth + kLabelBufferSpace;
     }
 }
 
