@@ -12,7 +12,7 @@
 
 @property(nonatomic, strong) UILabel* labelFront;
 @property(nonatomic, strong) UILabel* labelBack;
-@property(nonatomic, readonly)BOOL isGuessed;
+@property(nonatomic, readonly)BOOL isRevealed;
 
 - (id)initWithFrame:(CGRect)frame andText:(NSString*)alphabet;
 -(void)flipToFront;

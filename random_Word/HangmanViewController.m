@@ -12,6 +12,10 @@
 #import "AlphabetLabel.h"
 
 @interface HangmanViewController ()
+{
+    NSInteger score;
+    NSInteger misses;
+}
 
 @property (strong, nonatomic) NSString* randomWord;
 @property (strong, nonatomic) IBOutlet UILabel *oRandomWordLabel;
@@ -19,7 +23,7 @@
 @property (strong, nonatomic) NSString* currentGuess;
 
 @property (retain, nonatomic) UIView *alphabetsView;
-@property (retain, nonatomic) UIView *randomWordsView;
+@property (retain, nonatomic) UIView *randomWordView;
 
 - (IBAction)getRandomWordButton:(UIButton *)sender;
 
@@ -56,18 +60,21 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
+    [_currentGuess release];
     [_randomWord release];
     [_oRandomWordLabel release];
     [_alphabetsView release];
-    [_randomWordsView release];
+    [_randomWordView release];
     [super dealloc];
 }
 
 - (IBAction)getRandomWordButton:(UIButton *)sender
 {
    [self resetWordLabels];
-    
+    score = 0;
+    misses = 0;
     NSURLRequest* urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://api.wordnik.com//v4/words.json/randomWord?hasDictionaryDef=true&includePartOfSpeech=noun&maxLength=8&minCorpusCount=100000&minLength=6&api_key=ccf8c3f681887211b316a0aaba9013d03b1baf16f97d16359"]];
     
     [NSURLConnection sendAsynchronousRequest:urlRequest queue:[[NSOperationQueue alloc] init]
@@ -103,18 +110,34 @@
             }
         }
     }
+
 }
 
 -(void)compareGuess
 {
-    for(WordLabel* label in self.view.subviews) {
-        if([label isMemberOfClass:[WordLabel class]]) {
-            if([label.labelFront.text isEqualToString: self.currentGuess]) {
-                [label flipToFront];
-            }
+    BOOL noMatch = true;
+    for(WordLabel* label in self.randomWordView.subviews) {
+        if([label.labelFront.text isEqualToString: self.currentGuess]) {
+            [label flipToFront];
+            score++;
+            noMatch = false;
         }
     }
+    
+    if(noMatch) {
+        misses++;
+    }
+    [self checkIfGameShouldEnd];
+}
 
+-(void)checkIfGameShouldEnd
+{
+    if(score == [_randomWord length]) {
+        NSLog(@"you win!");
+    }
+    else if (misses == 10) {
+        NSLog(@"game over");
+    }
 }
 
 
@@ -123,11 +146,9 @@
 
 -(void)resetWordLabels
 {
-    for(UIView* view in self.view.subviews)
+    for(WordLabel* label in _randomWordView.subviews)
     {
-        if([view isMemberOfClass:[WordLabel class]]) {
-            [view removeFromSuperview];
-        }
+        [label removeFromSuperview];
     }
     
     for(AlphabetLabel* label in _alphabetsView.subviews) {
@@ -139,6 +160,9 @@
 
 -(void)drawAlphabetLabels
 {
+    NSString* alphabetsString = [[NSString alloc] initWithString:@"A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"];
+    NSMutableArray* alphabetsArray = [[alphabetsString componentsSeparatedByString:@","] mutableCopy];
+    
     CGFloat containerWidth = kAlphabetLabelWidth*2;
     CGFloat containerHeight = kAlphabetLabelHeight*13;
     
@@ -148,9 +172,6 @@
     CGFloat mCurrentX = 0.0f;
     CGFloat mCurrentY = 0.0f;
     CGFloat startY = mCurrentY;
-    
-    NSString* alphabetsString = [[NSString alloc] initWithString:@"A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"];
-    NSMutableArray* alphabetsArray = [[alphabetsString componentsSeparatedByString:@","] mutableCopy];
     
     int alphabetPosition = 0;
     
@@ -175,21 +196,24 @@
 
 -(void)drawRandomWordLabels
 {
-    CGFloat mCurrentX;
-    CGFloat startY = self.view.frame.size.height - (kRandomWordLabelHeight + kFooterSpace);
-    CGFloat containingViewWidth = self.view.frame.size.width;
     int numberOfLetters = [_randomWord length];
     
-    mCurrentX = (containingViewWidth - ((kRandomWordLabelWidth * numberOfLetters) + (kLabelBufferSpace * (numberOfLetters - 1))))/2;
+    CGFloat containerWidth = kRandomWordLabelWidth*numberOfLetters;
+    CGFloat containerHeight = kRandomWordLabelHeight;
+    
+    _randomWordView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - containerWidth)/2, self.view.frame.size.height - kRandomWordLabelHeight, containerWidth, containerHeight)];
+    [self.view addSubview:_randomWordView];
+    
+    CGFloat mCurrentX = 0.0f;
+    CGFloat mCurrentY = 0.0f;
     
     for(int i = 0; i < numberOfLetters; i++)
     {
         NSString* randomWordLetter = [NSString stringWithFormat:@"%c", [_randomWord characterAtIndex:i]];
-        WordLabel* wordLabel = [[WordLabel alloc] initWithFrame:CGRectMake(mCurrentX, startY, kRandomWordLabelWidth, kRandomWordLabelHeight) andText:randomWordLetter];
+        WordLabel* wordLabel = [[WordLabel alloc] initWithFrame:CGRectMake(mCurrentX, mCurrentY, kRandomWordLabelWidth, kRandomWordLabelHeight) andText:randomWordLetter];
         
-        [self.view addSubview:wordLabel];
-        
-        mCurrentX += kRandomWordLabelWidth + kLabelBufferSpace;
+        [self.randomWordView addSubview:wordLabel];
+        mCurrentX += kRandomWordLabelWidth;
     }
 }
 

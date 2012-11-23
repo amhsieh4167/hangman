@@ -18,8 +18,6 @@
 
 @implementation WordLabel
 
-@synthesize anArray = _anArray;
-
 - (id)initWithFrame:(CGRect)frame andText:(NSString*)alphabet
 {
     self = [super initWithFrame:frame];
@@ -40,15 +38,16 @@
         _labelFront.text = alphabet;
         [_labelFront retain];
         
-        /*
-        self.anArray = @[@"I am a property"];
-        _anArray = @[@"A", @"B"];
-        NSLog(@"%@", self.anArray);
-        */
-        
         [self addSubview:_labelBack];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [_labelFront release];
+    [_labelBack release];
+    [super dealloc];
 }
 
 -(void)flipToFront
@@ -59,7 +58,7 @@
                     animations: ^{
                         [_labelBack removeFromSuperview];
                         [self addSubview:_labelFront];
-                        _isGuessed = YES;
+                        _isRevealed = YES;
                     }
                     completion:NULL];
 }
@@ -72,7 +71,7 @@
                     animations: ^{
                         [_labelFront removeFromSuperview];
                         [self addSubview:_labelBack];
-                        _isGuessed = NO;
+                        _isRevealed = NO;
                     }
                     completion:NULL];
 }
