@@ -19,7 +19,8 @@ const CGFloat kAlphabetLabelBufferSpace = 10.0f;
 
 const CGFloat kFooterSpace = 20.0f;
 
-const NSInteger kMaximumGuess = 1;
+const NSInteger kMaximumGuess = 10;
+const NSInteger kMaximumNumberOfStoredHighScore = 10;
 
 enum { TwitterAlertView, GameEndAlertView } AlertViewTag;
 

@@ -27,6 +27,7 @@
 		FA9706A51661A86400579419 /* pedraza.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FA9706A41661A86400579419 /* pedraza.jpg */; };
 		FA9706AB1661AACD00579419 /* metal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FA9706AA1661AACD00579419 /* metal.jpg */; };
 		FA9706AD1661AB1800579419 /* gold.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FA9706AC1661AB1800579419 /* gold.jpg */; };
+		FA9706D61662098600579419 /* HighScoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FA9706D51662098600579419 /* HighScoreViewController.m */; };
 		FA97F750165707C50013F37F /* AlphabetLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = FA97F74F165707C50013F37F /* AlphabetLabel.m */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,8 @@
 		FA9706A41661A86400579419 /* pedraza.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = pedraza.jpg; path = Images/pedraza.jpg; sourceTree = "<group>"; };
 		FA9706AA1661AACD00579419 /* metal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = metal.jpg; path = Images/metal.jpg; sourceTree = "<group>"; };
 		FA9706AC1661AB1800579419 /* gold.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = gold.jpg; path = Images/gold.jpg; sourceTree = "<group>"; };
+		FA9706D41662098600579419 /* HighScoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighScoreViewController.h; sourceTree = "<group>"; };
+		FA9706D51662098600579419 /* HighScoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HighScoreViewController.m; sourceTree = "<group>"; };
 		FA97F74E165707C50013F37F /* AlphabetLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphabetLabel.h; sourceTree = "<group>"; };
 		FA97F74F165707C50013F37F /* AlphabetLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlphabetLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,6 +121,8 @@
 				FA95571D1655E6D100A55EBF /* IntroViewController.m */,
 				FA9557241655E86900A55EBF /* HangmanViewController.h */,
 				FA9557251655E86900A55EBF /* HangmanViewController.m */,
+				FA9706D41662098600579419 /* HighScoreViewController.h */,
+				FA9706D51662098600579419 /* HighScoreViewController.m */,
 				FA95575F16561C1D00A55EBF /* WordLabel.h */,
 				FA95576016561C1D00A55EBF /* WordLabel.m */,
 				FA97F74E165707C50013F37F /* AlphabetLabel.h */,
@@ -226,6 +231,7 @@
 				FA95576116561C1D00A55EBF /* WordLabel.m in Sources */,
 				FA97F750165707C50013F37F /* AlphabetLabel.m in Sources */,
 				FA97069D16618EEB00579419 /* HangmanImageView.m in Sources */,
+				FA9706D61662098600579419 /* HighScoreViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

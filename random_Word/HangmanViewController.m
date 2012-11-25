@@ -51,6 +51,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"highscore"];
+//    [[NSUserDefaults standardUserDefaults] objectForKey:@"highscore"];
 }
 
 - (void)didReceiveMemoryWarning
@@ -155,22 +157,9 @@
         titleAndTwitterPrompt = @{ @"title":@"You've won", @"twitter prompt":@"Brag about it!" };
         [self performSelector:@selector(showAlertWithTitle:) withObject:titleAndTwitterPrompt afterDelay:kAnimateDuration];
         
-        NSMutableArray* currentHighscores = [[NSMutableArray alloc] initWithArray:@[[[NSUserDefaults standardUserDefaults] arrayForKey:@"highscore"]]];
-        if (!currentHighscores) {
-            [[NSUserDefaults standardUserDefaults] setValue:currentHighscores forKey:@"highscore"];
-        }
 
-        for(int i=0; i < [currentHighscores count]; i++) {
-            if(misses < [[currentHighscores[i] valueForKey:@"numberOfMisses"] integerValue]) {
-                NSDictionary* highscore =@{
-                        @"numberOfMisses":[NSNumber numberWithInteger:misses],
-                        @"timeStamp":[NSDate date] };
-                [currentHighscores insertObject:highscore atIndex:i];
-                [currentHighscores removeLastObject];
-                i = [currentHighscores count]; // exit loop
-            }
-        }
-        [[NSUserDefaults standardUserDefaults] setValue:currentHighscores forKey:@"highscore"];
+
+//        I had NSString before and I could release. Not sure why I can't release NSDictionary here'
 //        [titleAndTwitterPrompt release];
     }
     else if (misses == kMaximumGuess) {
@@ -178,6 +167,36 @@
         [self performSelector:@selector(showAlertWithTitle:) withObject:titleAndTwitterPrompt afterDelay:kAnimateDuration];
 //        [titleAndTwitterPrompt release];
     }
+}
+
+-(void)saveToUserDefault
+{
+    NSMutableArray* topTenScores;
+    NSDictionary* currentScore;
+    
+    currentScore = @{
+    @"numberOfMisses":[NSNumber numberWithInteger:misses],
+    @"timeStamp":[NSDate date] };
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"highscore"]) {
+        topTenScores = [[NSUserDefaults standardUserDefaults] objectForKey:@"highscore"];
+        
+        for(int i=0; i < [topTenScores count]; i++) {
+            if(misses < [[topTenScores[i] valueForKey:@"numberOfMisses"] integerValue]) {
+                [topTenScores insertObject:currentScore atIndex:i];
+                [topTenScores removeLastObject];
+                i = [topTenScores count]; // exit loop
+            }
+            else if([topTenScores count] < kMaximumNumberOfStoredHighScore) {
+                [topTenScores insertObject:currentScore atIndex:i];
+                i = [topTenScores count]; // exit loop
+            }
+        }
+    }
+    else {
+        topTenScores = [[NSMutableArray alloc] initWithObjects:currentScore, nil];
+    }
+    [[NSUserDefaults standardUserDefaults] setValue:topTenScores forKey:@"highscore"];
 }
 
 

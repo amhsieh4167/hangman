@@ -34,7 +34,7 @@
         _labelFront = [[UILabel alloc] initWithFrame:labelFrame];
         _labelFront.backgroundColor = labelColor;
         _labelFront.textAlignment = textAlignment;
-        _labelFront.font = [UIFont fontWithName:@"AmericanTypewriter-Bold" size:45];
+        _labelFront.font = [UIFont fontWithName:@"AmericanTypewriter-Bold" size:35];
         _labelFront.textColor = textColor;
         _labelFront.text = alphabet;
         [_labelFront retain];
