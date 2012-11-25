@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/WordLabel.m"
-         timestampString = "375318564.211942"
+         timestampString = "375499863.065504"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "22"
-         endingLineNumber = "22"
+         startingLineNumber = "23"
+         endingLineNumber = "23"
          landmarkName = "-initWithFrame:andText:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/AlphabetLabel.m"
-         timestampString = "375306765.439146"
+         timestampString = "375509964.48457"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "58"
-         endingLineNumber = "58"
+         startingLineNumber = "59"
+         endingLineNumber = "59"
          landmarkName = "-setToFade"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/AlphabetLabel.m"
-         timestampString = "375306139.698439"
+         timestampString = "375492851.353326"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "20"
-         endingLineNumber = "20"
+         startingLineNumber = "15"
+         endingLineNumber = "15"
          landmarkName = "-initWithFrame:andText:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -60,11 +60,37 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/HangmanViewController.m"
-         timestampString = "375329868.653394"
+         timestampString = "375512781.402953"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "203"
-         endingLineNumber = "203"
+         startingLineNumber = "297"
+         endingLineNumber = "297"
+         landmarkName = "-postToTwitter"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "random_Word/HangmanViewController.m"
+         timestampString = "375512781.402953"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "180"
+         endingLineNumber = "180"
+         landmarkName = "-checkIfGameShouldEnd"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "random_Word/HangmanViewController.m"
+         timestampString = "375512781.402953"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "258"
+         endingLineNumber = "258"
          landmarkName = "-drawRandomWordLabels"
          landmarkType = "5">
       </FileBreakpoint>
@@ -73,25 +99,51 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "random_Word/HangmanViewController.m"
-         timestampString = "375329868.653394"
+         timestampString = "375509438.726134"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "211"
-         endingLineNumber = "211"
-         landmarkName = "-drawRandomWordLabels"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "random_Word/HangmanViewController.m"
-         timestampString = "375327200.789909"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "117"
-         endingLineNumber = "117"
+         startingLineNumber = "120"
+         endingLineNumber = "120"
          landmarkName = "-compareGuess"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "random_Word/HangmanViewController.m"
+         timestampString = "375509438.726134"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "152"
+         endingLineNumber = "152"
+         landmarkName = "-checkIfGameShouldEnd"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "random_Word/HangmanViewController.m"
+         timestampString = "375512781.402953"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "368"
+         endingLineNumber = "368"
+         landmarkName = "-alertView:clickedButtonAtIndex:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "random_Word/HangmanViewController.m"
+         timestampString = "375512649.05793"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "157"
+         endingLineNumber = "157"
+         landmarkName = "-checkIfGameShouldEnd"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

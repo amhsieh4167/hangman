@@ -10,4 +10,6 @@
 
 @interface HangmanViewController : UIViewController
 
+- (void)startGame;
+
 @end

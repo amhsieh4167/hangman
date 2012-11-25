@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Alex Hsieh. All rights reserved.
 //
 
+#define kAnimateDuration 1.0f
 #import <UIKit/UIKit.h>
 
 @interface WordLabel : UILabel

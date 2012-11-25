@@ -10,22 +10,22 @@
 #import "Constants.h"
 #import "WordLabel.h"
 #import "AlphabetLabel.h"
+#import "HangmanImageView.h"
+#import <Social/Social.h>
+#import <Accounts/Accounts.h>
 
-@interface HangmanViewController ()
+@interface HangmanViewController () <UIAlertViewDelegate>
 {
     NSInteger score;
     NSInteger misses;
 }
 
 @property (strong, nonatomic) NSString* randomWord;
-@property (strong, nonatomic) IBOutlet UILabel *oRandomWordLabel;
 
 @property (strong, nonatomic) NSString* currentGuess;
 
 @property (retain, nonatomic) UIView *alphabetsView;
 @property (retain, nonatomic) UIView *randomWordView;
-
-- (IBAction)getRandomWordButton:(UIButton *)sender;
 
 @end
 
@@ -51,7 +51,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self drawAlphabetLabels];
 }
 
 - (void)didReceiveMemoryWarning
@@ -64,37 +63,41 @@
 {
     [_currentGuess release];
     [_randomWord release];
-    [_oRandomWordLabel release];
     [_alphabetsView release];
     [_randomWordView release];
     [super dealloc];
 }
 
-- (IBAction)getRandomWordButton:(UIButton *)sender
+-(void)startGame
 {
-   [self resetWordLabels];
-    score = 0;
-    misses = 0;
-    NSURLRequest* urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://api.wordnik.com//v4/words.json/randomWord?hasDictionaryDef=true&includePartOfSpeech=noun&maxLength=8&minCorpusCount=100000&minLength=6&api_key=ccf8c3f681887211b316a0aaba9013d03b1baf16f97d16359"]];
-    
-    [NSURLConnection sendAsynchronousRequest:urlRequest queue:[[NSOperationQueue alloc] init]
-           completionHandler:^(NSURLResponse* response, NSData* data, NSError* error)
-                 {
-                     _randomWord = [[[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error] valueForKey:@"word"] uppercaseString];
-                     
-                     //must retain here, otherwise the value would be lost in the main queue
-                     [_randomWord retain];
-                     dispatch_async(dispatch_get_main_queue(), ^
-                             {
-                                 // on main queue
-                                 self.oRandomWordLabel.text = _randomWord;
-                                 [self drawRandomWordLabels];
-                             });
-                 }];
+    [self drawAlphabetLabels];
+    [self getRandomWord];
 }
 
 
-#pragma mark UIEvents
+#pragma mark Game logics
+
+
+-(void)getRandomWord
+{
+    // get a new word from wordnic
+    NSURLRequest* urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://api.wordnik.com//v4/words.json/randomWord?hasDictionaryDef=true&includePartOfSpeech=noun&maxLength=8&minCorpusCount=100000&minLength=6&api_key=ccf8c3f681887211b316a0aaba9013d03b1baf16f97d16359"]];
+    
+    [NSURLConnection sendAsynchronousRequest:urlRequest queue:[[NSOperationQueue alloc] init]
+                           completionHandler:^(NSURLResponse* response, NSData* data, NSError* error)
+     {
+         _randomWord = [[[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error] valueForKey:@"word"] uppercaseString];
+         
+         //must retain here, otherwise the value would be lost in the main queue
+         [_randomWord retain];
+         dispatch_async(dispatch_get_main_queue(),
+                        ^{
+                            // on main queue
+                            NSLog(@"random word is %@", _randomWord);
+                            [self drawRandomWordLabels];
+                        });
+     }];
+}
 
 
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -105,7 +108,7 @@
         if(CGRectContainsPoint(label.frame, touch)) {
             if (!label.isUsed) {
                 [label setToFade];
-                self.currentGuess = label.text;
+                self.currentGuess = label.unusedLabel.text;
                 [self compareGuess];
             }
         }
@@ -127,25 +130,65 @@
     if(noMatch) {
         misses++;
     }
+    
     [self checkIfGameShouldEnd];
+    [self drawHangman];
+}
+
+-(void)showAlertWithTitle:(NSDictionary*)titleAndTwitterPrompt
+{
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[titleAndTwitterPrompt valueForKey:@"title"]
+                                                        message:@"Play Again?"
+                                                       delegate:self
+                                              cancelButtonTitle:@"No, I need a nap"
+                                              otherButtonTitles:@"Sure, I have no life.",
+                                                                [titleAndTwitterPrompt valueForKey:@"twitter prompt"], nil];
+    alertView.tag = GameEndAlertView;
+    [alertView show];
+    [alertView release];
 }
 
 -(void)checkIfGameShouldEnd
 {
+    NSDictionary* titleAndTwitterPrompt;
     if(score == [_randomWord length]) {
-        NSLog(@"you win!");
+        titleAndTwitterPrompt = @{ @"title":@"You've won", @"twitter prompt":@"Brag about it!" };
+        [self performSelector:@selector(showAlertWithTitle:) withObject:titleAndTwitterPrompt afterDelay:kAnimateDuration];
+        
+        NSMutableArray* currentHighscores = [[NSMutableArray alloc] initWithArray:@[[[NSUserDefaults standardUserDefaults] arrayForKey:@"highscore"]]];
+        if (!currentHighscores) {
+            [[NSUserDefaults standardUserDefaults] setValue:currentHighscores forKey:@"highscore"];
+        }
+
+        for(int i=0; i < [currentHighscores count]; i++) {
+            if(misses < [[currentHighscores[i] valueForKey:@"numberOfMisses"] integerValue]) {
+                NSDictionary* highscore =@{
+                        @"numberOfMisses":[NSNumber numberWithInteger:misses],
+                        @"timeStamp":[NSDate date] };
+                [currentHighscores insertObject:highscore atIndex:i];
+                [currentHighscores removeLastObject];
+                i = [currentHighscores count]; // exit loop
+            }
+        }
+        [[NSUserDefaults standardUserDefaults] setValue:currentHighscores forKey:@"highscore"];
+//        [titleAndTwitterPrompt release];
     }
-    else if (misses == 10) {
-        NSLog(@"game over");
+    else if (misses == kMaximumGuess) {
+        titleAndTwitterPrompt = @{@"title":@"You've lost", @"twitter prompt":@"Internet will comfort you!"};
+        [self performSelector:@selector(showAlertWithTitle:) withObject:titleAndTwitterPrompt afterDelay:kAnimateDuration];
+//        [titleAndTwitterPrompt release];
     }
 }
 
 
-#pragma mark label methods
+#pragma mark draw labe and hangmanImageView methods
 
 
--(void)resetWordLabels
+-(void)resetGame
 {
+    score = 0;
+    misses = 0;
+    
     for(WordLabel* label in _randomWordView.subviews)
     {
         [label removeFromSuperview];
@@ -156,6 +199,23 @@
             [label setToDefault];
         }
     }
+    
+    for(UIImageView* imageView in self.view.subviews) {
+        if ([imageView isMemberOfClass: [HangmanImageView class]] && imageView.alpha == 1) {
+            [UIView animateWithDuration:kAnimateDuration animations:^{imageView.alpha = 0;}];
+        }
+    }
+    
+    [self getRandomWord];
+}
+
+-(void)drawHangman
+{
+    for(UIImageView* imageView in self.view.subviews) {
+        if(imageView.tag == misses) {
+            [UIView animateWithDuration:kAnimateDuration animations:^{imageView.alpha = 1;}];
+        }
+    }
 }
 
 -(void)drawAlphabetLabels
@@ -163,32 +223,32 @@
     NSString* alphabetsString = [[NSString alloc] initWithString:@"A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"];
     NSMutableArray* alphabetsArray = [[alphabetsString componentsSeparatedByString:@","] mutableCopy];
     
-    CGFloat containerWidth = kAlphabetLabelWidth*2;
-    CGFloat containerHeight = kAlphabetLabelHeight*13;
+    CGFloat containerWidth = kAlphabetLabelWidth*13;
+    CGFloat containerHeight = kAlphabetLabelHeight*2;
     
-    _alphabetsView = [[UIView alloc] initWithFrame:CGRectMake(260.0f, 14.0f, containerWidth, containerHeight)];
+    _alphabetsView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - containerWidth)/2, self.view.frame.size.height - containerHeight, containerWidth, containerHeight)];
     [self.view addSubview:_alphabetsView];
     
     CGFloat mCurrentX = 0.0f;
     CGFloat mCurrentY = 0.0f;
-    CGFloat startY = mCurrentY;
+    CGFloat startX = mCurrentX;
     
     int alphabetPosition = 0;
     
-    while (mCurrentX + kAlphabetLabelWidth <= containerWidth)
+    while (mCurrentY + kAlphabetLabelHeight <= containerHeight)
     {
-        while ((mCurrentY + kAlphabetLabelHeight <= containerHeight) && (alphabetPosition < 26))
+        while (mCurrentX + kAlphabetLabelWidth <= containerWidth)
         {
             AlphabetLabel* alphabetLabel = [[AlphabetLabel alloc] initWithFrame:CGRectMake(mCurrentX, mCurrentY, kAlphabetLabelWidth, kAlphabetLabelHeight) andText:alphabetsArray[alphabetPosition]];
             
-            alphabetLabel.text = alphabetsArray[alphabetPosition];
+            alphabetLabel.backgroundColor = [UIColor clearColor];
             alphabetPosition++;
             [_alphabetsView addSubview:alphabetLabel];
-
-            mCurrentY += kAlphabetLabelHeight;
+            
+            mCurrentX += kAlphabetLabelWidth;
         }
-        mCurrentY = startY;
-        mCurrentX += kAlphabetLabelWidth;
+        mCurrentY += kAlphabetLabelHeight;
+        mCurrentX = startX;
     }
     [alphabetsString release];
     [alphabetsArray release];
@@ -201,7 +261,7 @@
     CGFloat containerWidth = kRandomWordLabelWidth*numberOfLetters;
     CGFloat containerHeight = kRandomWordLabelHeight;
     
-    _randomWordView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - containerWidth)/2, self.view.frame.size.height - kRandomWordLabelHeight, containerWidth, containerHeight)];
+    _randomWordView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - containerWidth)/2, self.view.frame.size.height - (kAlphabetLabelHeight*2 + kRandomWordLabelHeight), containerWidth, containerHeight)];
     [self.view addSubview:_randomWordView];
     
     CGFloat mCurrentX = 0.0f;
@@ -211,10 +271,136 @@
     {
         NSString* randomWordLetter = [NSString stringWithFormat:@"%c", [_randomWord characterAtIndex:i]];
         WordLabel* wordLabel = [[WordLabel alloc] initWithFrame:CGRectMake(mCurrentX, mCurrentY, kRandomWordLabelWidth, kRandomWordLabelHeight) andText:randomWordLetter];
-        
+        wordLabel.backgroundColor = [UIColor clearColor];
         [self.randomWordView addSubview:wordLabel];
         mCurrentX += kRandomWordLabelWidth;
     }
 }
 
+
+#pragma mark social service methods
+
+
+-(void)postToTwitter
+{
+    SLComposeViewController* mySLComposerSheet;
+    if([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
+    {
+        mySLComposerSheet = [[SLComposeViewController alloc] init];
+        mySLComposerSheet = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+        
+        if (misses == kMaximumGuess) {
+            [mySLComposerSheet setInitialText:@"I lost a game Hangman"];
+         } else {
+             [mySLComposerSheet setInitialText:@"Hey I just won at life"];
+         }
+        
+        
+        CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
+        CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
+        CGContextRef ctx = CGBitmapContextCreate(nil, screenSize.width, screenSize.height, 8, 4*(int)screenSize.width, colorSpaceRef, kCGImageAlphaPremultipliedLast);
+        CGContextTranslateCTM(ctx, 0.0, screenSize.height);
+        CGContextScaleCTM(ctx, 1.0, -1.0);
+        
+        [(CALayer*)self.view.layer renderInContext:ctx];
+        
+        CGImageRef cgImage = CGBitmapContextCreateImage(ctx);
+        UIImage *twitterImage = [UIImage imageWithCGImage:cgImage];
+        CGImageRelease(cgImage);
+        CGContextRelease(ctx);
+        [mySLComposerSheet addImage:twitterImage];
+        [self presentViewController:mySLComposerSheet animated:YES completion:nil];
+    }
+    [mySLComposerSheet setCompletionHandler:^(SLComposeViewControllerResult result) {
+        NSString *title;
+        switch (result) {
+            case SLComposeViewControllerResultCancelled:
+                title = @"I am too humble to boast";
+                break;
+            case SLComposeViewControllerResultDone:
+                title = @"The World knows I am awesome!";
+                break;
+            default:
+                break;
+        } //check if everythink worked properly. Give out a message on the state.
+        [self dismissViewControllerAnimated:YES completion:nil];
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:title message:@"Play Again?" delegate:self cancelButtonTitle:@"Nah, I need a nap" otherButtonTitles:@"Sure I have no life", nil];
+        alertView.tag = TwitterAlertView;
+        [alertView show];
+        [alertView release];
+    }];
+//    why can't release here?'
+//    [mySLComposerSheet release];
+}
+
+
+#pragma mark UIAlertViewDelegate
+
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(alertView.tag == GameEndAlertView) {
+        switch (buttonIndex) {
+            case 0:
+                [self dismissViewControllerAnimated:YES completion:nil];
+                break;
+            case 1:
+                [self resetGame];
+                break;
+            case 2:
+                [self postToTwitter];
+                break;
+            default:
+                break;
+        }
+    } else if (alertView.tag == TwitterAlertView) {
+        switch (buttonIndex) {
+            case 0:
+                [self dismissViewControllerAnimated:YES completion:nil];
+                break;
+            case 1:
+                [self resetGame];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 @end
+
+//-(void)drawAlphabetLabels
+//{
+//    NSString* alphabetsString = [[NSString alloc] initWithString:@"A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"];
+//    NSMutableArray* alphabetsArray = [[alphabetsString componentsSeparatedByString:@","] mutableCopy];
+//
+//    CGFloat containerWidth = kAlphabetLabelWidth*13;
+//    CGFloat containerHeight = kAlphabetLabelHeight*2;
+//
+//    _alphabetsView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - containerWidth)/2, self.view.frame.size.height - containerHeight, containerWidth, containerHeight)];
+//    [self.view addSubview:_alphabetsView];
+//
+//    CGFloat mCurrentX = 0.0f;
+//    CGFloat mCurrentY = 0.0f;
+//    CGFloat startY = mCurrentY;
+//
+//    int alphabetPosition = 0;
+//
+//    while (mCurrentX + kAlphabetLabelWidth <= containerWidth)
+//    {
+//        while (mCurrentY + kAlphabetLabelHeight <= containerHeight)
+//        {
+//            AlphabetLabel* alphabetLabel = [[AlphabetLabel alloc] initWithFrame:CGRectMake(mCurrentX, mCurrentY, kAlphabetLabelWidth, kAlphabetLabelHeight) andText:alphabetsArray[alphabetPosition]];
+//
+//            alphabetLabel.backgroundColor = [UIColor clearColor];
+//            alphabetPosition++;
+//            [_alphabetsView addSubview:alphabetLabel];
+//
+//            mCurrentY += kAlphabetLabelHeight;
+//        }
+//        mCurrentY = startY;
+//        mCurrentX += kAlphabetLabelWidth;
+//    }
+//    [alphabetsString release];
+//    [alphabetsArray release];
+//}

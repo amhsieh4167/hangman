@@ -9,34 +9,36 @@
 #import "AlphabetLabel.h"
 
 @implementation AlphabetLabel
-{
-    UILabel* defaultLabel;
-    UILabel* usedLabel;
-}
 
 - (id)initWithFrame:(CGRect)frame andText:(NSString*)alphabet
 {
     self = [super initWithFrame:frame];
     if (self) {
-        UIFont* labelFont = [UIFont boldSystemFontOfSize:16];
-        NSInteger textAlignment = NSTextAlignmentCenter;
         CGRect labelFrame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+        UIColor* labelColor = [UIColor clearColor];
+        UIFont* labelFont = [UIFont fontWithName:@"AmericanTypewriter-Bold" size:20];
+        NSInteger textAlignment = NSTextAlignmentCenter;
+
         
-        defaultLabel = [[UILabel alloc] initWithFrame:labelFrame];
-        defaultLabel.textColor = [UIColor blackColor];
-        defaultLabel.font = labelFont;
-        defaultLabel.textAlignment = textAlignment;
-        defaultLabel.text = alphabet;
-        [defaultLabel retain];
+        _unusedLabel = [[UILabel alloc] initWithFrame:labelFrame];
+        _unusedLabel.backgroundColor = labelColor;
+        _unusedLabel.font = labelFont;
+        _unusedLabel.textAlignment = textAlignment;
+        _unusedLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"gold.jpg"]];
+        _unusedLabel.text = alphabet;
+        [_unusedLabel retain];
         
-        usedLabel = [[UILabel alloc] initWithFrame:labelFrame];
-        usedLabel.textColor = [UIColor grayColor];
-        usedLabel.font = labelFont;
-        usedLabel.textAlignment = textAlignment;
-        usedLabel.text = alphabet;
-        [usedLabel retain];
+        _usedLabel = [[UILabel alloc] initWithFrame:labelFrame];
+        _usedLabel.backgroundColor = labelColor;
+        _usedLabel.font = labelFont;
+        _usedLabel.textAlignment = textAlignment;
+//        _usedLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"rusted-metal-pattern.jpg"]];
+        _usedLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"metal.jpg"]];
+        _usedLabel.text = alphabet;
+
+        [_usedLabel retain];
         
-        [self addSubview:defaultLabel];
+        [self addSubview:_unusedLabel];
     }
     return self;
 }
@@ -44,27 +46,27 @@
 -(void)setToDefault
 {
     [UIView transitionWithView:self
-                      duration:1.0f
+                      duration:kAnimateDuration
                        options:UIViewAnimationOptionTransitionFlipFromRight
                     animations: ^{
-                        [usedLabel removeFromSuperview];
-                        [self addSubview:defaultLabel];
+                        [_usedLabel removeFromSuperview];
+                        [self addSubview:_unusedLabel];
                         _isUsed = NO;
                     }
-                    completion:NULL];
+                    completion:nil];
 }
 
 -(void)setToFade
 {
     [UIView transitionWithView:self
-                      duration:1.0f
+                      duration:kAnimateDuration
                        options:UIViewAnimationOptionTransitionCrossDissolve
                     animations: ^{
-                        [defaultLabel removeFromSuperview];
-                        [self addSubview:usedLabel];
+                        [_unusedLabel removeFromSuperview];
+                        [self addSubview:_usedLabel];
                         _isUsed = YES;
                     }
-                    completion:NULL];
+                    completion:nil];
 }
 
 // Only override drawRect: if you perform custom drawing.

@@ -10,6 +10,8 @@
 
 @interface AlphabetLabel : WordLabel
 
+@property(nonatomic, strong) UILabel* unusedLabel;
+@property(nonatomic, strong) UILabel* usedLabel;
 @property(nonatomic, readonly)BOOL isUsed;
 
 -(void)setToDefault;
