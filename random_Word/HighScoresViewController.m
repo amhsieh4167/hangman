@@ -6,13 +6,13 @@
 //  Copyright (c) 2012 Alex Hsieh. All rights reserved.
 //
 
-#import "HighScoreViewController.h"
+#import "HighScoresViewController.h"
 
-@interface HighScoreViewController ()
+@interface HighScoresViewController ()
 
 @end
 
-@implementation HighScoreViewController
+@implementation HighScoresViewController
 {
     NSMutableArray* topTenScores;
 }

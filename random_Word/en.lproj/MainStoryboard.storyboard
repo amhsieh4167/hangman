@@ -77,10 +77,10 @@
             </objects>
             <point key="canvasLocation" x="150" y="55"/>
         </scene>
-        <!--High Score View Controller-->
+        <!--High Scores View Controller-->
         <scene sceneID="GVC-or-dvx">
             <objects>
-                <tableViewController id="3AZ-wm-hqm" customClass="HighScoreViewController" sceneMemberID="viewController">
+                <tableViewController id="3AZ-wm-hqm" customClass="HighScoresViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Bmc-Je-nMQ">
                         <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
